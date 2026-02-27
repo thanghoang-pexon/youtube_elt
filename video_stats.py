@@ -3,6 +3,7 @@ import json
 
 import os
 from dotenv import load_dotenv
+from datetime import date
 
 load_dotenv(dotenv_path=".env")
 
@@ -107,7 +108,15 @@ def extract_video_data(video_ids):
         raise e
 
 
+def save_to_json(extracted_data):
+    # ensure the data directory exists relative to the current working
+    # directory (typically the project root where the script is run from)
+    data_dir = os.path.join(os.getcwd(), "data")
+    os.makedirs(data_dir, exist_ok=True)
 
+    file_path = os.path.join(data_dir, f"YT_data_{date.today()}.json")
+    with open(file_path, 'w', encoding='utf-8') as json_outfile:
+        json.dump(extracted_data, json_outfile, indent=4, ensure_ascii=False)
 
 
 if __name__ == "__main__":
@@ -115,5 +124,7 @@ if __name__ == "__main__":
     # remove stray closing parenthesis
     video_ids = get_video_ids(playlistId)
     videos = extract_video_data(video_ids)
-    print(json.dumps(videos, indent=2))
+    video_data = extract_video_data(video_ids)
+    save_to_json(video_data)
+
 
